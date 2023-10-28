@@ -45,6 +45,10 @@ test('convexHull', t => {
   let hull = [[0, 0], [0, 1], [1, 1], [1, 0]]
   t.alike(convexHull(points), hull)
 
+  points = [[0, 0], [0, 1], [1, 1], [1, 0], [1, 1]]
+  hull = [[0, 0], [0, 1], [1, 1], [1, 0]]
+  t.alike(convexHull(points), hull)
+
   points = [[0, 0], [0, 1], [1, 1], [1, 0], [0.5, 0.5]]
   hull = [[0, 0], [0, 1], [1, 1], [1, 0]]
   t.alike(convexHull(points), hull)
@@ -59,6 +63,22 @@ test('convexHull', t => {
 
   points = [[0, 0], [0, 1], [1, 1], [1, 0], [0.5, 0.5], [0.5, 0.75], [0.5, 0.25], [0.5, 0.125]]
   hull = [[0, 0], [0, 1], [1, 1], [1, 0]]
+  t.alike(convexHull(points), hull)
+
+  points = [[0, 0]]
+  hull = [[0, 0]]
+  t.alike(convexHull(points), hull)
+
+  points = [[0, 0], [0, 1]]
+  hull = [[0, 0], [0, 1]]
+  t.alike(convexHull(points), hull)
+
+  points = [[0, 0], [0, 1], [1, 1]]
+  hull = [[0, 0], [0, 1], [1, 1]]
+  t.alike(convexHull(points), hull)
+
+  points = [[0, 0], [1, 1], [2, 2]]
+  hull = [[0, 0], [2, 2]]
   t.alike(convexHull(points), hull)
 })
 
