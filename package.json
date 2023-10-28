@@ -1,0 +1,33 @@
+{
+  "name": "pacifism",
+  "version": "1.0.0",
+  "description": "game to avoide colision of convex hulls ",
+  "main": "index.js",
+  "scripts": {
+    "lint": "standard",
+    "test": " brittle test/**/*.test.js --coverage --bail"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dzdidi/pacifism.git"
+  },
+  "keywords": [
+    "p2p",
+    "hyperswarm",
+    "game",
+    "pacifism"
+  ],
+  "author": "dzdidi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dzdidi/pacifism/issues"
+  },
+  "homepage": "https://github.com/dzdidi/pacifism#readme",
+  "dependencies": {
+    "brittle": "^3.3.2",
+    "corestore": "^6.15.9",
+    "hyperswarm": "^4.7.3",
+    "random-access-memory": "^6.2.0",
+    "standard": "^17.1.0"
+  }
+}
