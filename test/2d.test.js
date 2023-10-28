@@ -1,5 +1,5 @@
 const test = require('brittle')
-const { distance, findSide, convexHull, getEdges, getAxis, isOverlap, doHullsIntersect } = require('../lib/2d')
+const { distance, findSide, convexHull, getEdges, getAxis, isOverlap, doHullsIntersect, getConvexHullArea } = require('../lib/2d')
 
 test('distance', t => {
   let p1 = [0, 0]
@@ -108,3 +108,10 @@ test('doHullsIntersect', t => {
   t.is(doHullsIntersect(hull1, hull2), false)
 })
 
+test('getConvexHullArea', t => {
+  let hull = convexHull([[0, 0], [1, 0], [1, 1], [0, 1]])
+  t.is(getConvexHullArea(hull), 1)
+
+  hull = convexHull([[0, 0], [0, 5], [6, 6]])
+  t.is(getConvexHullArea(hull), 15)
+})
