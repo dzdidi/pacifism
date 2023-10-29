@@ -5,6 +5,7 @@ const Corestore = require('corestore')
 const Hyperswarm = require('hyperswarm')
 
 const { convexHull, doPolygonsIntersect, getConvexHullArea } = require('./lib/2d.js')
+const { parseLine } = require('./lib/helpers.js')
 
 // TODO: communicate with other player
 const fieldSize = 10
@@ -51,7 +52,7 @@ const rl = readline.createInterface({
     console.log('Move fast!')
     let myHull = []
     rl.on('line', async (line) => {
-      const point = parseLine(line)
+      const point = parseLine(line, fieldSize)
 
       const res = addPoint(myHull, point)
       myHull = res.hull
@@ -77,14 +78,6 @@ const rl = readline.createInterface({
   })
 })()
 
-function parseLine (line) {
-  const split = line.split(',')
-  if (split.length !== 2) throw new Error('invalid input: must be 2d array')
-  if (split.some(el => isNaN(el))) throw new Error('invalid input: must be 2d array of integers')
-  if (split.some(el => el < 0 || el > fieldSize)) throw new Error('invalid input: must be 2d array of integers in range')
-
-  return split.map(el => parseInt(el))
-}
 
 function addPoint(hull, point) {
   const newHull = convexHull([...hull, point])
