@@ -33,7 +33,7 @@ const rl = readline.createInterface({
     await swarm.flush()
 
     let theirHull = []
-    them.createReadStream({ live: true }).on('data', (data) => {
+    them.createReadStream({ live: true }).on('data', async (data) => {
       console.log('thier last move:', theirHull, data.toString())
       const point = parseRemoteLine(data.toString(), fieldSize)
 
@@ -55,14 +55,14 @@ const rl = readline.createInterface({
       await me.append(JSON.stringify(point))
       if (res.gameOver) {
         // Lag to make sure the other player sees the last move and game result
-        await new Promise(r => setTimeout(r, 500));
+        await new Promise((resolve, _reject) => setTimeout(resolve, 500))
         await getWinner(res.hull, theirHull, exitCallback)
       }
     })
 
     rl.on('close', exitCallback)
 
-    async exitCallback() {
+    async function exitCallback () {
       console.log('Bye!')
       await me.session().close()
       await them.session().close()

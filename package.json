@@ -4,7 +4,7 @@
   "description": "game to avoide colision of convex hulls ",
   "main": "index.js",
   "scripts": {
-    "lint": "standard",
+    "lint": "standard index.js ./lib/**/*.js ./test/**/*.js --fix",
     "test": " brittle test/**/*.test.js --coverage --bail"
   },
   "repository": {

@@ -3,7 +3,7 @@ const { parseLine, parseRemoteLine } = require('../lib/helpers.js')
 
 test('parseLine', (t) => {
   let line = '1,2'
-  let res = parseLine(line)
+  const res = parseLine(line)
   t.is(res[0], 1)
   t.is(res[1], 2)
 
@@ -19,7 +19,7 @@ test('parseLine', (t) => {
 
 test('parseRemoteLine', (t) => {
   let line = '[1,2]'
-  let res = parseRemoteLine(line)
+  const res = parseRemoteLine(line)
   t.is(res[0], 1)
   t.is(res[1], 2)
 
