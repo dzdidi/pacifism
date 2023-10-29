@@ -4,10 +4,9 @@ const RAM = require('random-access-memory')
 const Corestore = require('corestore')
 const Hyperswarm = require('hyperswarm')
 
-const { convexHull, doPolygonsIntersect, getConvexHullArea } = require('./lib/2d.js')
-const { parseLine } = require('./lib/helpers.js')
+const { addMove, getWinner } = require('./lib/game.js')
+const { parseLine, parseRemoteLine } = require('./lib/helpers.js')
 
-// TODO: communicate with other player
 const fieldSize = 10
 
 const rl = readline.createInterface({
@@ -35,18 +34,14 @@ const rl = readline.createInterface({
 
     let theirHull = []
     them.createReadStream({ live: true }).on('data', (data) => {
-      // TODO: check field size
-
       console.log('thier last move:', theirHull, data.toString())
-      const res = addPoint(theirHull, JSON.parse(data.toString()))
-      if (res.gameOver) {
-        console.log(getWinner(myHull, res.hull))
-        rl.close()
-      } else {
-        theirHull = res.hull
-      }
+      const point = parseRemoteLine(data.toString(), fieldSize)
 
+      const res = addMove(theirHull, point, myHull)
+      theirHull = res.hull
       console.log('Their hull:', theirHull)
+
+      if (res.gameOver) await getWinner(myHull, res.hull, exitCallback)
     })
 
     console.log('Move fast!')
@@ -54,49 +49,26 @@ const rl = readline.createInterface({
     rl.on('line', async (line) => {
       const point = parseLine(line, fieldSize)
 
-      const res = addPoint(myHull, point)
+      const res = addMove(myHull, point, theirHull)
       myHull = res.hull
       console.log('My hull:', myHull)
       await me.append(JSON.stringify(point))
-
       if (res.gameOver) {
         // Lag to make sure the other player sees the last move and game result
         await new Promise(r => setTimeout(r, 500));
-        console.log(getWinner(res.hull, theirHull))
-        rl.close()
+        await getWinner(res.hull, theirHull, exitCallback)
       }
     })
 
-    rl.on('close', async () => {
+    rl.on('close', exitCallback)
+
+    async exitCallback() {
       console.log('Bye!')
       await me.session().close()
       await them.session().close()
       await me.close()
       await them.close()
       process.exit(0)
-    })
+    }
   })
 })()
-
-
-function addPoint(hull, point) {
-  const newHull = convexHull([...hull, point])
-  const sameLength = newHull.length === hull.length
-  const sameArea = getConvexHullArea(newHull) === getConvexHullArea(hull)
-  if (sameLength && sameArea) return { hull, gameOver: true }
-
-  return { hull: newHull, gameOver: false }
-}
-
-function getWinner(hullA, hullB) {
-  const areaA = getConvexHullArea(hullA)
-  const areaB = getConvexHullArea(hullB)
-  if (areaA > areaB) {
-    return 'A'
-  } else if (areaA < areaB) {
-    return 'B'
-  } else {
-    return 'D'
-  }
-}
-
