@@ -32,21 +32,15 @@ const rl = readline.createInterface({
     swarm.join(them.discoveryKey)
     await swarm.flush()
 
-    let theirHull = []
-    them.createReadStream({ live: true }).on('data', async (data) => {
-      console.log('thier last move:', theirHull, data.toString())
-      const point = parseRemoteLine(data.toString(), fieldSize)
-
-      const res = addMove(theirHull, point, myHull)
-      theirHull = res.hull
-      console.log('Their hull:', theirHull)
-
-      if (res.gameOver) await getWinner(myHull, res.hull, exitCallback)
-    })
-
     console.log('Move fast!')
+
+    let theirHull = []
     let myHull = []
-    rl.on('line', async (line) => {
+    them.createReadStream({ live: true }).on('data', dataCallback)
+    rl.on('line', lineCallback)
+    rl.on('close', exitCallback)
+
+    async function lineCallback (line) {
       const point = parseLine(line, fieldSize)
 
       const res = addMove(myHull, point, theirHull)
@@ -58,9 +52,18 @@ const rl = readline.createInterface({
         await new Promise((resolve, _reject) => setTimeout(resolve, 500))
         await getWinner(res.hull, theirHull, exitCallback)
       }
-    })
+    }
 
-    rl.on('close', exitCallback)
+    async function dataCallback (data) {
+      console.log('thier last move:', theirHull, data.toString())
+      const point = parseRemoteLine(data.toString(), fieldSize)
+
+      const res = addMove(theirHull, point, myHull)
+      theirHull = res.hull
+      console.log('Their hull:', theirHull)
+
+      if (res.gameOver) await getWinner(myHull, res.hull, exitCallback)
+    }
 
     async function exitCallback () {
       console.log('Bye!')
