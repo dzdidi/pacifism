@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/dzdidi/pacifism#readme",
   "dependencies": {
+    "@hyperswarm/testnet": "^3.1.4",
     "brittle": "^3.3.2",
     "corestore": "^6.15.9",
     "hyperswarm": "^4.7.3",
