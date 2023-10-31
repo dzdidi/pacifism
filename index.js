@@ -1,77 +1,23 @@
 const readline = require('readline')
 
-const RAM = require('random-access-memory')
-const Corestore = require('corestore')
-const Hyperswarm = require('hyperswarm')
-
-const { addMove, getWinner } = require('./lib/game.js')
-const { parseLine, parseRemoteLine } = require('./lib/helpers.js')
-
-const fieldSize = 10
+const { Game } = require('./lib/game.js')
 
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 })
 
-;(async () => {
-  const store = new Corestore(RAM)
-  const me = store.get({ name: 'me' })
-  await me.ready()
+;(async function () {
+  const game = new Game()
+  await game.init()
 
-  const swarm = new Hyperswarm()
-  swarm.on('connection', (conn, _peerInfo) => store.replicate(conn))
-  swarm.join(me.discoveryKey)
-
-  console.log('your key', me.key.toString('hex'), 'share it with your friend')
-
-  rl.question('paste friend\'s key: ', async (pK) => {
-    const them = store.get(Buffer.from(pK, 'hex'))
-    await them.ready()
-
-    swarm.join(them.discoveryKey)
-    await swarm.flush()
-
+  rl.question('paste friend\'s key: ', async function (pK) {
+    await game.start(pK)
     console.log('Move fast!')
-
-    let theirHull = []
-    let myHull = []
-    them.createReadStream({ live: true }).on('data', dataCallback)
-    rl.on('line', lineCallback)
-    rl.on('close', exitCallback)
-
-    async function lineCallback (line) {
-      const point = parseLine(line, fieldSize)
-
-      const res = addMove(myHull, point, theirHull)
-      myHull = res.hull
-      console.log('My hull:', myHull)
-      await me.append(JSON.stringify(point))
-      if (res.gameOver) {
-        // Lag to make sure the other player sees the last move and game result
-        await new Promise((resolve, _reject) => setTimeout(resolve, 500))
-        await getWinner(res.hull, theirHull, exitCallback)
-      }
-    }
-
-    async function dataCallback (data) {
-      console.log('thier last move:', theirHull, data.toString())
-      const point = parseRemoteLine(data.toString(), fieldSize)
-
-      const res = addMove(theirHull, point, myHull)
-      theirHull = res.hull
-      console.log('Their hull:', theirHull)
-
-      if (res.gameOver) await getWinner(myHull, res.hull, exitCallback)
-    }
-
-    async function exitCallback () {
-      console.log('Bye!')
-      await me.session().close()
-      await them.session().close()
-      await me.close()
-      await them.close()
+    rl.on('line', game.handleMyInput)
+    rl.on('close', async () => {
+      await game.exitCallback()
       process.exit(0)
-    }
+    })
   })
 })()
