@@ -126,6 +126,14 @@ test('doHullsIntersect', t => {
   hull1 = [[0, 0], [0, 1], [1, 1], [1, 0]]
   hull2 = [[2, 0], [2, 1], [3, 1], [3, 0]]
   t.is(doHullsIntersect(hull1, hull2), false)
+
+  hull1 = [[0, 0]]
+  hull2 = [[1, 1]]
+  t.is(doHullsIntersect(hull1, hull2), false)
+
+  hull1 = [[0, 0], [1, 1]]
+  hull2 = [[0, 1], [1, 0]]
+  t.is(doHullsIntersect(hull1, hull2), true)
 })
 
 test('getConvexHullArea', t => {
