@@ -9,15 +9,15 @@ const rl = readline.createInterface({
 
 ;(async function () {
   const game = new Game()
-  await game.init()
+  await game.init(() => {
+    console.log('GG! WP!')
+    rl.close()
+    process.exit(0)
+  })
 
   rl.question('paste friend\'s key: ', async function (pK) {
     await game.start(pK)
-    console.log('Move fast!')
+    console.log('GL! HF!')
     rl.on('line', game.handleMyInput)
-    rl.on('close', async () => {
-      await game.exitCallback()
-      process.exit(0)
-    })
   })
 })()
